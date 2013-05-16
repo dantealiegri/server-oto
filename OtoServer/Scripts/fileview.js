@@ -1,37 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>OTO</title>
-        <link rel="stylesheet" type="text/css" href="Content/Css/default.css" />
-    <script type="text/javascript" src="Scripts/jquery-1.8.3.min.js"></script>
-</head>
-<body>
-
-<div id="info">
-    <h3>
-    GitHub-like OTO server
-    </h3>
-</div>
-    <a id="btn-reset" href="#!revertfiles" class="btn"><span>revert files</span></a>
-    <div id="breadcrumb">
-    </div>
-    <div id="ls">
-    </div>
-    <div id="fileadmin">
-        <div class="mkdir ib">
-            <input id="dirname" placeholder="new folder name" /><a class="btn"><span>create folder</span></a></div>
-        <div class="upload ib">
-            <input type="file" name="fileupload" id="fileupload" /><a class="btn"><span>upload here</span></a></div>
-    </div>
-  <div id="fileview">
-  </div>
-  <div id="footer">
-      <div id="disclaimer">
-        *Not responsible for eaten shoes.
-      </div>
-  </div>
-
-  <script>
+﻿
        $.ajaxSetup({ cache: false, dataType: 'json' });
 
        function fromDtoDate(dateStr) {
@@ -117,7 +84,9 @@
 
         $(".btn").mousedown(function () { $(this).toggleClass("mousedown"); });
         $(".btn").mouseup(function () { $(this).toggleClass("mousedown"); });
-        var refresh = function (callback, skipPushState) {
+
+
+
             if (!skipPushState && window.history.pushState)
                 window.history.pushState(href, href.replace('/', ' / '), '#!' + href);
 
@@ -142,15 +111,38 @@
                 cls = !hasResults ? "results-1" : nextCls;
                 var sb = "<div class='" + cls + "'><table><thead><tr><th>name</th><th>age</th><th>size</th></thead><tbody>";
 
-                var files = r.Files;
+                var file = r.Files;
+                if (file) {
+
+                    var jqFile = $("#fileview");
+                    var sb = "<h3><a class='btn edit' href='#!savechanges'><span>save changes</span></a></dd>"
+                       + "<span class='ib txt'></span><dl><dd>" + enc(file.FileSizeBytes) + " bytes</dd><dd>"
+                       + toTwitterTime(fromDtoDate(file.ModifiedDate)) + "</dd>"
+                       + '<dd><a class="btn download" href="' + href + '?ForDownload=true"><span>download file</span></a></dd>'
+                       + "</dl></h3>";
+                    jqFile.html(sb).show();
+
+                    var height = $("#footer").position().top - $("#ls").position().top;
+                    $("#fileview TEXTAREA").height(height - 65);
+
+                    $("#fileadmin").hide();
+                    $("#ls").html("").hide();
+                    return;
+                }
 
                 $("#fileview").html("").hide();
-                if (files) {
-                    if (files.length > 1) {
+                var dirList = r.Directory;
+                if (dirList) {
+                    if (dirs.length > 1) {
                         var upHref = href.substr(0, href.lastIndexOf('/', href.length - 2));
                         sb += "<tr><td><a class='up-dir' href='#!" + upHref + "'>..<a></td><td></td><td></td></tr>";
                     }
-                    $.each(files, function (i, file) {
+                    $.each(dirList.Folders, function (i, dir) {
+                        sb += "<tr><td><a class='dir' href='#!" + href + "/" + dir.Name + "'>" + dir.Name + "/<a></td><td>"
+                        + toTwitterTime(fromDtoDate(dir.ModifiedDate)) + "</td><td>"
+                        + dir.FileCount + " files</td>";
+                    });
+                    $.each(dirList.Files, function (i, file) {
                         sb += "<tr><td><a class='file' href='#!" + href + "/" + file.Name + "'><b class='del' href='#!deletefile'></b>" + file.Name + "</a></td><td>"
                         + toTwitterTime(fromDtoDate(file.ModifiedDate)) + "</td><td>"
                         + file.FileSizeBytes + " bytes</td>";
@@ -178,19 +170,3 @@
                     $("#ls").css({ "min-height": jq1.height() + "px" });
                 }
             });
-        };
-        window.onpopstate = function (e) {
-            e = e || event;
-            if (!e.state) return;
-            href = e.state;
-            refresh(null, true);
-        };
-
-
-
-      var hash = location.hash.indexOf('#!') === 0 && location.hash.substr(2);
-      if (hash) href = hash;
-      refresh();
-  </script>
-</body>
-</html>

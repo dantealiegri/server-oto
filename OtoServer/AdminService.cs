@@ -41,14 +41,14 @@ namespace OtoServer
             {
 
                 return new OtoFilesResponse {
-                    Files = FakeFileResult()
+                    Files = FakeFileResult( request.Guid )
                 };
                        
 
             }
             else
                 return new OtoFilesResponse {
-                    Files = FakeFileResult()
+                    Files = FakeFileResult( request.Guid )
                 };
                        
         }
@@ -67,17 +67,19 @@ namespace OtoServer
 
             }
         }
-        private List<OtoFile> FakeFileResult()
+        private List<OtoFile> FakeFileResult( string guid )
         {
             List<OtoFile> results = new List<OtoFile>();
-
+            bool guid_set = ( guid != null && guid != "");
+            if( ! guid_set || guid == "{abcde}" )
+            {
             results.Add(
                 new OtoFile{
                     Name = "Station A Installer 1.0.1",
                     Extension = ".msi",
                     FileSizeBytes = 1024,
                     Version = "1.0.1.0",
-                    ModifiedTime = new DateTime( 2013, 05,01,08,30,00)
+                    ModifiedDate = new DateTime( 2013, 05,01,08,30,00)
                 }
                 );
             results.Add(
@@ -86,9 +88,34 @@ namespace OtoServer
                     Extension = ".msi",
                     FileSizeBytes = 1024,
                     Version = "1.0.2.1",
-                    ModifiedTime = new DateTime( 2013, 05,04,15,29,04)
+                    ModifiedDate = new DateTime( 2013, 05,04,15,29,04)
                 }
                 );
+            }
+
+            if( ! guid_set || guid ==  "{fghij}" )
+            {
+                results.Add(
+                    new OtoFile
+                    {
+                        Name = "Station B Installer 2.8.32",
+                        Extension = ".msi",
+                        FileSizeBytes = 1024,
+                        Version = "2.8.32.1",
+                        ModifiedDate = new DateTime(2013, 05, 01, 08, 30, 00)
+                    }
+                    );
+                results.Add(
+                    new OtoFile
+                    {
+                        Name = "Station B Installer 2.8",
+                        Extension = ".msi",
+                        FileSizeBytes = 1024,
+                        Version = "2.8.0.0",
+                        ModifiedDate = new DateTime(2013, 01, 09, 10, 14, 37)
+                    }
+                );
+            }
 
             return results;
         }

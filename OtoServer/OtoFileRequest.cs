@@ -29,6 +29,6 @@ namespace OtoServer
         public string Extension { get; set; }
         public string Version { get; set; }
         public long FileSizeBytes { get; set; }
-        public DateTime ModifiedTime { get; set; }
+        public DateTime ModifiedDate { get; set; }
     }
 }
