@@ -8,7 +8,7 @@ namespace OtoServer.Omaha
 {
     namespace V3
     {
-        [Serializable, XmlElement("response")]
+        [Serializable, XmlRoot( ElementName = "response")]
         public class Result
         {
             [XmlAttribute]
@@ -40,6 +40,8 @@ namespace OtoServer.Omaha
             public PingResult ping;
             [XmlElement("event")]
             public List<EventResponse> event_responses;
+            [XmlElement("data")]
+            public List<DataResult> data_results;
         }
 
         [Serializable]
@@ -103,10 +105,25 @@ namespace OtoServer.Omaha
             public string version;
 
         }
+
+        public class EventResponse
+        {
+            [XmlAttribute]
+            public string status;
+        }
+
+        public class DataResult
+        {
+            [XmlAttribute]
+            public string name;
+            [XmlAttribute]
+            public string index;
+            [XmlAttribute]
+            public string status;
+            [XmlText]
+            public string data;
+        }
     }
 
-    public class EventResponse
-    {
-        [XmlAttribute]
-        public string status;
+
 }

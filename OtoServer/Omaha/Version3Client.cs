@@ -8,7 +8,7 @@ namespace OtoServer.Omaha
 {
     namespace V3
     {
-        [Serializable, XmlElement("request")]
+        [Serializable, XmlRoot( ElementName = "request")]
         public class Request
         {
             [XmlAttribute]
@@ -73,6 +73,9 @@ namespace OtoServer.Omaha
             [XmlElement("event")]
             public List<EventReport> events;
 
+            [XmlElement("data")]
+            public List<DataRequest> data;
+
         }
 
 
@@ -101,6 +104,15 @@ namespace OtoServer.Omaha
             [XmlAttribute]
             public Int32 extracode1;
         }
+
+        public class DataRequest
+        {
+            [XmlAttribute]
+            public string name;
+            [XmlAttribute]
+            public string index;
+            [XmlText]
+            public string data;
         }
 
     }
