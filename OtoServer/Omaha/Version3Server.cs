@@ -38,6 +38,8 @@ namespace OtoServer.Omaha
 
             public UpdateResult updatecheck;
             public PingResult ping;
+            [XmlElement("event")]
+            public List<EventResponse> event_responses;
         }
 
         [Serializable]
@@ -102,4 +104,9 @@ namespace OtoServer.Omaha
 
         }
     }
+
+    public class EventResponse
+    {
+        [XmlAttribute]
+        public string status;
 }

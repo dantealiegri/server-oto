@@ -70,6 +70,9 @@ namespace OtoServer.Omaha
             public UpdateCheck updatecheck;
             public PingRequest ping;
 
+            [XmlElement("event")]
+            public List<EventReport> events;
+
         }
 
 
@@ -84,6 +87,20 @@ namespace OtoServer.Omaha
         {
             [XmlAttribute]
             public string r;
+        }
+
+        [Serializable]
+        public class EventReport
+        {
+            [XmlAttribute]
+            public Int32 eventtype;
+            [XmlAttribute]
+            public Int32 eventresult;
+            [XmlAttribute]
+            public Int32 errorcode;
+            [XmlAttribute]
+            public Int32 extracode1;
+        }
         }
 
     }
