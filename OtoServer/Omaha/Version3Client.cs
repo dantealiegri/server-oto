@@ -8,7 +8,7 @@ namespace OtoServer.Omaha
 {
     namespace V3
     {
-        [Serializable]
+        [Serializable, XmlElement("request")]
         public class Request
         {
             [XmlAttribute]
@@ -31,6 +31,8 @@ namespace OtoServer.Omaha
 
 
             public OSInfo os;
+            // serialize list items in Request.
+            [XmlElement("app")]
             public List<AppInfoRequest> apps;
         }
 

@@ -8,7 +8,7 @@ namespace OtoServer.Omaha
 {
     namespace V3
     {
-        [Serializable]
+        [Serializable, XmlElement("response")]
         public class Result
         {
             [XmlAttribute]
@@ -17,6 +17,7 @@ namespace OtoServer.Omaha
             public string server;
 
             public DayStart daystart;
+            [XmlElement("app")]
             public List<AppInfoResult> app_results;
         }
 
@@ -52,6 +53,7 @@ namespace OtoServer.Omaha
             [XmlAttribute]
             public string status;
 
+            [XmlArrayItem(ElementName="url", Type = typeof(UpdateUrl))]
             public List<UpdateUrl> urls;
             public UpdateManifest manifest;
         }
@@ -75,9 +77,13 @@ namespace OtoServer.Omaha
 
         public class UpdatePackage
         {
+            [XmlAttribute]
             public string hash;
+            [XmlAttribute]
             public string name;
+            [XmlAttribute]
             public string required;
+            [XmlAttribute]
             public UInt32 size;
         }
 
@@ -85,9 +91,13 @@ namespace OtoServer.Omaha
         {
             [XmlAttribute("event")]
             public string on_event;
+            [XmlAttribute]
             public string arguments;
+            [XmlAttribute]
             public string run;
+            [XmlAttribute]
             public string onsuccess;
+            [XmlAttribute]
             public string version;
 
         }
