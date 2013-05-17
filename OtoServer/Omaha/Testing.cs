@@ -12,14 +12,14 @@ namespace OtoServer.Omaha
 
         public static void Serialize()
         {
-            XmlSerializer client_serialize = new XmlSerializer( typeof(V3.Request));
-            XmlSerializer server_serialize = new XmlSerializer( typeof(V3.Result));
+            XmlSerializer client_serialize = new XmlSerializer( typeof(V3.OmahaClient));
+            XmlSerializer server_serialize = new XmlSerializer( typeof(V3.OmahaClientResponse));
             StringWriter ssw = new StringWriter();
             StringWriter csw = new StringWriter();
             StringWriter sdsw = new StringWriter();
             StringWriter cdsw = new StringWriter();
 
-            V3.Request sample_request = new V3.Request {
+            V3.OmahaClient sample_request = new V3.OmahaClient {
                 protocol = "3.0",
                 version = "1.3.23.0",
                 ismachine = "0",
@@ -61,7 +61,7 @@ namespace OtoServer.Omaha
                 )
             };
 
-            V3.Result sample_result = new V3.Result{
+            V3.OmahaClientResponse sample_result = new V3.OmahaClientResponse {
                 protocol = "3.0",
                 server = "prod",
                 daystart = new V3.DayStart { elapsed_seconds = 56508 },
@@ -111,7 +111,7 @@ namespace OtoServer.Omaha
                 })
             };
 
-            V3.Request sample_data_request = new V3.Request {
+            V3.OmahaClient sample_data_request = new V3.OmahaClient {
                 protocol = "3.0",
                 version = "1.3.23.0",
                 ismachine = "0",
@@ -151,7 +151,8 @@ namespace OtoServer.Omaha
                 }
                 )
             };
-            V3.Result sample_data_result = new V3.Result{
+
+            V3.OmahaClientResponse sample_data_result = new V3.OmahaClientResponse {
                 protocol = "3.0",
                 server = "prod",
                 daystart = new V3.DayStart { elapsed_seconds = 56508 },

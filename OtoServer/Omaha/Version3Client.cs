@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.Serialization;
+using ServiceStack.ServiceHost;
 
 namespace OtoServer.Omaha
 {
     namespace V3
     {
         [Serializable, XmlRoot( ElementName = "request")]
-        public class Request
+        [Route("/service/update2")]
+        public class OmahaClient
         {
             [XmlAttribute]
             public string protocol;

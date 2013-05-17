@@ -9,7 +9,7 @@ namespace OtoServer.Omaha
     namespace V3
     {
         [Serializable, XmlRoot( ElementName = "response")]
-        public class Result
+        public class OmahaClientResponse
         {
             [XmlAttribute]
             public string protocol;
