@@ -14,7 +14,6 @@ namespace OtoServer.Omaha
     namespace V3
     {
         [Route("/service/update2")]
-        [Serializable, XmlRoot( ElementName = "request"), XmlSerializerFormat( Style = OperationFormatStyle.Rpc )]
         public class OmahaClient : IXmlSerializable
         {
             public string protocol;
@@ -147,6 +146,7 @@ namespace OtoServer.Omaha
 
             public List<DataRequest> data;
 
+            #region IXmlSerializable
             public XmlSchema GetSchema() { return null; }
             public void ReadXml(XmlReader r)
             {
@@ -249,38 +249,48 @@ namespace OtoServer.Omaha
                     }
 
             }
+            #endregion IXmlSerializable
         }
 
 
-        [Serializable]
         public class UpdateCheck
         {
+
+            #region IXmlSerializable
+
             public XmlSchema GetSchema() { return null; }
             public void ReadXml(XmlReader r)
             {
             }
+
             public void WriteXml(XmlWriter w)
             {
             }
+
+            #endregion IXmlSerializable
         }
 
 
-        [Serializable]
         public class PingRequest
         {
             public string r;
 
+            #region IXmlSerializable
+
             public XmlSchema GetSchema() { return null; }
+
             public void ReadXml(XmlReader reader)
             {
                 reader.MoveToNextAttribute();
                 if (reader.Name == "r")
                     r = reader.Value;
             }
+
             public void WriteXml(XmlWriter w)
             {
                 w.WriteAttributeString("r", r);
             }
+            #endregion IXmlSerializable
         }
 
         [Serializable]
@@ -291,7 +301,11 @@ namespace OtoServer.Omaha
             public Int32 errorcode;
             public Int32 extracode1;
 
+
+            #region IXmlSerializable
+
             public XmlSchema GetSchema() { return null; }
+
             public void ReadXml(XmlReader r)
             {
                 while (r.MoveToNextAttribute())
@@ -302,6 +316,7 @@ namespace OtoServer.Omaha
                     else if (r.Name == "extracode1") extracode1 = Int32.Parse( r.Value);
                 }
             }
+
             public void WriteXml(XmlWriter w)
             {
                 w.WriteAttributeString("eventtype", eventtype.ToString());
@@ -309,6 +324,7 @@ namespace OtoServer.Omaha
                 w.WriteAttributeString("errorcode", errorcode.ToString());
                 w.WriteAttributeString("extracode1", extracode1.ToString());
             }
+            #endregion IXmlSerializable
 
         }
 
@@ -316,10 +332,12 @@ namespace OtoServer.Omaha
         {
             public string name;
             public string index;
-            [XmlText]
             public string data;
 
+
+            #region IXmlSerializable
             public XmlSchema GetSchema() { return null; }
+
             public void ReadXml(XmlReader r)
             {
                 while (r.MoveToNextAttribute())
@@ -334,12 +352,14 @@ namespace OtoServer.Omaha
                         data = r.Value;
                 }
             }
+
             public void WriteXml(XmlWriter w)
             {
                 w.WriteAttributeString("name", name);
                 w.WriteAttributeString("index", index);
                 w.WriteString(data);
             }
+            #endregion IXmlSerializable
         }
 
     }
