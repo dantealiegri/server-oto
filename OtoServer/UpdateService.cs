@@ -64,7 +64,28 @@ namespace OtoServer
 
                 if (app_req.updatecheck != null)
                 {
-                    app_res.updatecheck = new UpdateResult { status = "noupdate" };
+                    UpdateResult update_result = null;
+                    DataStore.App matched = DataStore.DataStore.Instance().KnownApps.SingleOrDefault(k_app => k_app.guid == app_req.appid);
+                    if (matched == null || matched.current.version == app_req.version)
+                    {
+                        update_result = new UpdateResult { status = "noupdate" };
+                    }
+                    else
+                    {
+                        UpdateManifest update_manifest = new UpdateManifest {
+                            version = matched.current.version,
+                            updated_packages = matched.current.package.Select<DataStore.AppPackage,UpdatePackage>(
+                                ap => new UpdatePackage { hash = ap.hash, name = ap.name, required = ap.required ? "true":"false", size = ap.size } ).ToList(),
+                            update_actions = matched.current.actions.Select<DataStore.AppAction,UpdateAction>(
+                                aa => new UpdateAction { on_event = aa.on_event, arguments = aa.arguments, run = aa.run, onsuccess = aa.on_success, version = aa.version }).ToList()
+                        };
+                        List<UpdateUrl> url_list = matched.current.url_locations.Select<string,UpdateUrl>(url_string => new UpdateUrl { codebase = url_string }).ToList();
+
+                        update_result = new UpdateResult { status = "ok", urls = url_list, manifest = update_manifest };
+
+                    }
+
+                    app_res.updatecheck = update_result;
                 }
 
                 resp.app_results.Add(app_res);

@@ -17,6 +17,7 @@ namespace OtoServer.DataStore
         public string version; // must be w.x.y.z
         public List<string> url_locations;
         public List<AppPackage> package;
+        public List<AppAction> actions;
     }
 
     public class AppPackage
@@ -25,7 +26,6 @@ namespace OtoServer.DataStore
         public string name;
         public bool required;
         public UInt32 size;
-        public List<AppAction> actions;
     }
 
     public class AppAction
@@ -71,6 +71,7 @@ namespace OtoServer.DataStore
                 }
                     )
             };
+            omaha.current = omaha.versions[0];
 
             App chrome = new App
             {
@@ -84,11 +85,17 @@ namespace OtoServer.DataStore
                             new AppPackage[] {
                                 new AppPackage {
                                     hash = "012349jkgxc90asdhfjk99" , name = "chrome_installer.exe", required = true, size = 42 }
-                            } )
+                            } ),
+                            actions = new List<AppAction>( new AppAction[] {
+                                new AppAction { on_event = "install", arguments ="--do-not-launch-chrome", run="chrome_installer.exe" },
+                                new AppAction { on_event = "postinstall", version ="13.0.782.112", on_success="exitsilentlyonlaunchcmd" }
+                            })
+                       
                     }
                 }
                     )
             };
+            chrome.current = chrome.versions[0];
 
             KnownApps = new List<App>(new App[] { omaha, chrome });
 
