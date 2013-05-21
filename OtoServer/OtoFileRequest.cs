@@ -19,7 +19,11 @@ namespace OtoServer
 
     public class OtoFilesResponse : IHasResponseStatus
     {
+        public List<string> breadcrumbs { get; set; }
+        public List<string> breadcrumbnames { get; set; }
+
         public List<OtoFile> Files { get; set; }
+        public List<OtoApplication> Applications { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -30,5 +34,11 @@ namespace OtoServer
         public string Version { get; set; }
         public long FileSizeBytes { get; set; }
         public DateTime ModifiedDate { get; set; }
+    }
+
+    public class OtoApplication
+    {
+        public string DisplayName { get; set; }
+        public string LinkName { get; set; }
     }
 }

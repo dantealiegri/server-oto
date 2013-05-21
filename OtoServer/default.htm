@@ -121,21 +121,23 @@
             if (!skipPushState && window.history.pushState)
                 window.history.pushState(href, href.replace('/', ' / '), '#!' + href);
 
-            var dirs = href.replace(/\/$/, "").split('/');
-            var sb = '<div id="breadcrumb">';
-            var sbDirs = "";
-            for (var i = 0; i < dirs.length; i++) {
-                var dir = dirs[i];
-                if (!dir) continue;
-                sb += (i == dirs.length - 1)
-                ? '<strong>' + dir + '</strong>'
-                : '<a href="#!' + sbDirs + dir + '">' + dir + '</a><b>/</b>';
-                sbDirs += dir + "/";
-            }
-            $("#breadcrumb").html(sb + "</div>");
 
             var jqLs = $("#ls");
             $.getJSON(href, function (r) {
+
+                // set breadcrumbs.
+                var sb = '<div id="breadcrumb">';
+                var bc_base = "";
+                for (var i = 0; i < r.breadcrumbs.length; i++) {
+                    var bc = r.breadcrumbs[i];
+                    if (!bc) continue;
+                    sb += (i == r.breadcrumbs.length - 1)
+                    ? '<strong>' + r.breadcrumbnames[i] + '</strong>'
+                    : '<a href="#!' + bc_base + bc + '">' + r.breadcrumbnames[i] + '</a><b>/</b>';
+                    bc_base += bc + "/";
+                }
+                $("#breadcrumb").html(sb + "</div>");
+                //
                 var navBack = lastHref.length > href.length && lastHref.substr(0, href.length) == href,
                 nextCls = navBack ? "results-0" : "results-2",
                 hasResults = $("#ls TABLE").length == 1,
@@ -144,7 +146,6 @@
 
                 var files = r.Files;
 
-                $("#fileview").html("").hide();
                 if (files) {
                     if (files.length > 1) {
                         var upHref = href.substr(0, href.lastIndexOf('/', href.length - 2));
@@ -154,6 +155,15 @@
                         sb += "<tr><td><a class='file' href='#!" + href + "/" + file.Name + "'><b class='del' href='#!deletefile'></b>" + file.Name + "</a></td><td>"
                         + toTwitterTime(fromDtoDate(file.ModifiedDate)) + "</td><td>"
                         + file.FileSizeBytes + " bytes</td>";
+                    });
+                }
+
+                $("#fileview").html("").hide();
+                var apps = r.Applications;
+
+                if (apps) {
+                    $.each(apps, function (i, app) {
+                        sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "</a></td></td>";
                     });
                 }
 
@@ -185,6 +195,34 @@
             href = e.state;
             refresh(null, true);
         };
+
+        var clickHandlers = {
+            files: function (el, e, href) {
+                if (e.ctrlKey || e.shiftKey) {
+                    window.open('#!' + href);
+                    return;
+                }
+                refresh();
+            }
+        }
+
+        $(document).click(function (e) {
+            var attrHref, el = e.target;
+            do { attrHref = el.getAttribute("href"); } while (!attrHref && (el = el.parentElement));
+            if (!attrHref) return;
+
+            if (attrHref.substr(0, 2) == "#!") {
+                lastHref = href, href = attrHref.substr(2);
+                var cmd = href.split('/')[0];
+
+                var clickHandler = clickHandlers[cmd];
+                if (clickHandler) {
+                    if (e.preventDefault) e.preventDefault();
+                    clickHandler(el, e, href);
+                }
+            }
+        });
+
 
 
 

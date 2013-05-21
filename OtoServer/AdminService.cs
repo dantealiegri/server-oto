@@ -37,10 +37,16 @@ namespace OtoServer
         private OtoFilesResponse FilterStoreToResponse( List<DataStore.App> apps, string guid )
         {
             OtoFilesResponse resp = new OtoFilesResponse();
+            resp.breadcrumbs = new List<string>(new string[] { "/files" });
+            resp.breadcrumbnames = new List<string>(new string[] { "Applications" });
+
             foreach (DataStore.App app in apps)
             {
-                if (guid == null || guid == "" || guid == app.guid)
+                string display_name = String.Format("{0} ({1})", app.name, app.guid);
+                if ( guid == app.guid)
                 {
+                    resp.breadcrumbnames.Add( display_name );
+                    resp.breadcrumbs.Add(app.guid);
                     foreach (DataStore.AppVersion version_of_app in app.versions)
                     {
                         OtoFile of = new OtoFile();
@@ -52,6 +58,15 @@ namespace OtoServer
                             resp.Files = new List<OtoFile>();
                         resp.Files.Add(of);
                     }
+                }
+                else if (guid == null || guid == "")
+                {
+                    if( resp.Applications == null )
+                        resp.Applications = new List<OtoApplication>();
+                    OtoApplication oapp = new OtoApplication { DisplayName = display_name , LinkName = app.guid };
+                    resp.Applications.Add( oapp );
+
+
                 }
             }
             return resp;

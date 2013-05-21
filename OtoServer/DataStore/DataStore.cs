@@ -8,6 +8,7 @@ namespace OtoServer.DataStore
     public class App
     {
         public string guid;
+        public string name;
         public AppVersion current;
         public List<AppVersion> versions;
     }
@@ -56,6 +57,7 @@ namespace OtoServer.DataStore
         {
             App omaha = new App
             {
+                name = "Omaha",
                 guid = "{430FD4D0-B729-4F61-AA34-91526481799D}",
                 versions = new List<AppVersion>(
                     new AppVersion[] {
@@ -75,6 +77,7 @@ namespace OtoServer.DataStore
 
             App chrome = new App
             {
+                name = "Chrome",
                 guid = "{D0AB2EBC-931B-4013-9FEB-C9C4C2225C8C}",
                 versions = new List<AppVersion>(
                     new AppVersion[] {
