@@ -10,7 +10,8 @@ namespace OtoServer.Omaha
 {
     namespace V3
     {
-        public class OmahaClientResponse
+        [XmlRoot( ElementName="response")]
+        public class OmahaClientResponse : IXmlSerializable
         {
             public string protocol;
             public string server;
@@ -29,21 +30,51 @@ namespace OtoServer.Omaha
                     else if (reader.Name == "server")
                         server = reader.Value;
                 }
+
+                while (reader.Read())
+                {
+                    if (reader.Name == "daystart")
+                    {
+                        daystart = new DayStart();
+                        XmlReader s = reader.ReadSubtree();
+                        s.Read();
+                        daystart.ReadXml(s);
+                        s.Close();
+                    }
+                    else if (reader.Name == "app")
+                    {
+                        if (app_results == null)
+                            app_results = new List<AppInfoResult>();
+                        AppInfoResult info = new AppInfoResult();
+                        XmlReader s = reader.ReadSubtree();
+                        s.Read();
+                        info.ReadXml(s);
+                        s.Close();
+                        app_results.Add(info);
+
+                    }
+                }
             }
 
             public void WriteXml(XmlWriter w)
             {
                 w.WriteAttributeString("protocol", protocol);
                 w.WriteAttributeString("server", server);
+                w.WriteStartElement("daystart");
                 daystart.WriteXml(w);
+                w.WriteEndElement();
                 if (app_results != null)
                     foreach (AppInfoResult app in app_results)
+                    {
+                        w.WriteStartElement("app");
                         app.WriteXml(w);
+                        w.WriteEndElement();
+                    }
             }
             #endregion IXmlSerializable
         }
 
-        public class DayStart
+        public class DayStart : IXmlSerializable
         {
             public UInt32 elapsed_seconds;
             #region IXmlSerializable
@@ -63,7 +94,7 @@ namespace OtoServer.Omaha
             #endregion IXmlSerializable
         }
 
-        public class AppInfoResult
+        public class AppInfoResult : IXmlSerializable
         {
             public string appid;
             public string status;
@@ -136,17 +167,35 @@ namespace OtoServer.Omaha
                 w.WriteAttributeString("appid", appid);
                 w.WriteAttributeString("status", status);
 
-                if (updatecheck != null) updatecheck.WriteXml(w);
-                if( ping != null ) ping.WriteXml(w);
+                if (updatecheck != null)
+                {
+                w.WriteStartElement("updatecheck");
+                    updatecheck.WriteXml(w);
+                w.WriteEndElement();
+                }
+
+                if (ping != null)
+                {
+                    w.WriteStartElement("ping");
+                    ping.WriteXml(w);
+                    w.WriteEndElement();
+                }
+
                 if (event_responses != null)
+                {
                     foreach (EventResponse rsp in event_responses)
+                    {
+                        w.WriteStartElement("events");
                         rsp.WriteXml(w);
+                        w.WriteEndElement();
+                    }
+                }
 
             }
             #endregion IXmlSerializable
         }
 
-        public class PingResult
+        public class PingResult : IXmlSerializable
         {
             [XmlAttribute]
             public string status;
@@ -167,7 +216,7 @@ namespace OtoServer.Omaha
             #endregion IXmlSerializable
         }
 
-        public class UpdateResult
+        public class UpdateResult : IXmlSerializable
         {
             public string status;
 
@@ -226,17 +275,25 @@ namespace OtoServer.Omaha
                 {
                     w.WriteStartElement("urls");
                     foreach (UpdateUrl url in urls)
+                    {
+                        w.WriteStartElement("url");
                         url.WriteXml(w);
+                        w.WriteEndElement();
+                    }
                     w.WriteEndElement();
                 }
                 if (manifest != null)
+                {
+                    w.WriteStartElement("manifest");
                     manifest.WriteXml(w);
+                    w.WriteEndElement();
+                }
 
             }
             #endregion IXmlSerializable
         }
 
-        public class UpdateUrl
+        public class UpdateUrl : IXmlSerializable
         {
             public string codebase;
 
@@ -257,7 +314,7 @@ namespace OtoServer.Omaha
             #endregion IXmlSerializable
         }
 
-        public class UpdateManifest
+        public class UpdateManifest : IXmlSerializable
         {
             public string version;
 
@@ -334,21 +391,29 @@ namespace OtoServer.Omaha
                 {
                     w.WriteStartElement("actions");
                     foreach (UpdateAction ua in update_actions)
+                    {
+                        w.WriteStartElement("action");
                         ua.WriteXml(w);
+                        w.WriteEndElement();
+                    }
                     w.WriteEndElement();
                 }
                 if (updated_packages != null && updated_packages.Count > 0)
                 {
                     w.WriteStartElement("packages");
                     foreach (UpdatePackage up in updated_packages)
+                    {
+                        w.WriteStartElement("package");
                         up.WriteXml(w);
+                        w.WriteEndElement();
+                    }
                     w.WriteEndElement();
                 }
             }
             #endregion IXmlSerializable
         }
 
-        public class UpdatePackage
+        public class UpdatePackage : IXmlSerializable
         {
             public string hash;
             public string name;
@@ -381,7 +446,7 @@ namespace OtoServer.Omaha
             #endregion IXmlSerializable
         }
 
-        public class UpdateAction
+        public class UpdateAction : IXmlSerializable
         {
             public string on_event;
             public string arguments;
@@ -419,7 +484,7 @@ namespace OtoServer.Omaha
 
         }
 
-        public class EventResponse
+        public class EventResponse : IXmlSerializable
         {
             public string status;
 
@@ -440,7 +505,7 @@ namespace OtoServer.Omaha
             #endregion IXmlSerializable
         }
 
-        public class DataResult
+        public class DataResult : IXmlSerializable
         {
             public string name;
             public string index;

@@ -230,11 +230,23 @@ namespace OtoServer.Omaha
             dcs_c_s.WriteObject(xw, sample_request);
             object o = dcs_c_s.ReadObject(xtr);
 
+            XmlTextReader sxtr = new XmlTextReader(new StringReader(server_xml));
+            DataContractSerializer dcs_s_s = new DataContractSerializer(typeof(V3.OmahaClientResponse));
+            object so = dcs_s_s.ReadObject(sxtr);
+
+            MemoryStream ms = new MemoryStream();
+            dcs_s_s.WriteObject(ms, sample_result);
+            ms.Flush();
+            ms.Position = 0;
+            var sr = new StreamReader(ms);
+            string s = sr.ReadToEnd();
+
 
             client_serialize.Serialize(csw, sample_request);
             Console.WriteLine("Client is " + csw.ToString() );
             server_serialize.Serialize(ssw, sample_result);
             Console.WriteLine("Server is " + ssw.ToString() );
+
 
             client_serialize.Serialize(cdsw, sample_data_request);
             server_serialize.Serialize(sdsw, sample_data_result);

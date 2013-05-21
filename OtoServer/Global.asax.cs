@@ -36,6 +36,8 @@ namespace OtoServer
 
         void Application_Start(object sender, EventArgs e)
         {
+           // Console.WriteLine("Started");
+           // Omaha.Testing.Serialize();
             (new OtoApp()).Init();
         }
 

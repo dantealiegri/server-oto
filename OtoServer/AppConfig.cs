@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.IO;
+using ServiceStack.Common.Utils;
 using ServiceStack.Configuration;
 
 namespace OtoServer
@@ -16,6 +18,11 @@ namespace OtoServer
 
         public AppConfig(IResourceManager resources)
         {
+            this.TextFileExtensions = resources.GetList("TextFileExtensions");
+            this.RootDirectory = resources.GetString("RootDirectory").MapHostAbsolutePath().MapHostAbsolutePath()
+                .Replace('\\', Path.DirectorySeparatorChar);
         }
+
+        public IList<string> TextFileExtensions { get; set; }
     }
 }

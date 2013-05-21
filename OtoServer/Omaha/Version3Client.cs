@@ -14,6 +14,7 @@ namespace OtoServer.Omaha
     namespace V3
     {
         [Route("/service/update2")]
+        [XmlRoot( ElementName="request")]
         public class OmahaClient : IXmlSerializable
         {
             public string protocol;
