@@ -23,6 +23,8 @@ namespace OtoServer
         public object Post(OmahaClient request)
         {
             OmahaClientResponse resp = new OmahaClientResponse();
+            resp.protocol = "3.0";
+            resp.server = "oto-test";
             DateTime beginning_of_day = DateTime.Now.Date;
             resp.daystart = new DayStart { elapsed_seconds = (uint)(DateTime.Now - beginning_of_day).TotalSeconds };
             resp.app_results = new List<AppInfoResult>();

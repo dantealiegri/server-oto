@@ -13,7 +13,10 @@ namespace OtoServer
     {
         public class OtoApp : AppHostBase
         {
-            public OtoApp() : base("Omaha Terminal Operator", typeof(OtoFiles).Assembly) { }
+            public OtoApp() : base("Omaha Terminal Operator", typeof(OtoFiles).Assembly) 
+            {
+                DataStore.DataStore.Initialize();
+            }
 
             public override void Configure(Funq.Container container)
             {
