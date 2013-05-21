@@ -143,6 +143,7 @@
     </Compile>
     <Compile Include="AdminService.cs" />
     <Compile Include="AppConfig.cs" />
+    <Compile Include="DataStore\DataStore.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

@@ -46,6 +46,8 @@ namespace OtoServer.DataStore
             instance.TestPopulate();
         }
 
+        public static DataStore Instance() { return instance; }
+
         private DataStore()
         {
         }
@@ -87,6 +89,8 @@ namespace OtoServer.DataStore
                 }
                     )
             };
+
+            KnownApps = new List<App>(new App[] { omaha, chrome });
 
         }
 

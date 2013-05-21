@@ -34,23 +34,32 @@ namespace OtoServer
 
     public class OtoFilesService : Service
     {
+        private OtoFilesResponse FilterStoreToResponse( List<DataStore.App> apps, string guid )
+        {
+            OtoFilesResponse resp = new OtoFilesResponse();
+            foreach (DataStore.App app in apps)
+            {
+                if (guid == null || guid == "" || guid == app.guid)
+                {
+                    foreach (DataStore.AppVersion version_of_app in app.versions)
+                    {
+                        OtoFile of = new OtoFile();
+                        of.Extension = "msi";
+                        of.FileSizeBytes = version_of_app.package[0].size;
+                        of.ModifiedDate = DateTime.Now;
+                        of.Name = version_of_app.package[0].name;
+                        if (resp.Files == null)
+                            resp.Files = new List<OtoFile>();
+                        resp.Files.Add(of);
+                    }
+                }
+            }
+            return resp;
+        }
         public object Get( OtoFiles request )
         {
             Console.WriteLine("GET request");
-            if (request.Guid == null || request.Guid == "")
-            {
-
-                return new OtoFilesResponse {
-                    Files = FakeFileResult( request.Guid )
-                };
-                       
-
-            }
-            else
-                return new OtoFilesResponse {
-                    Files = FakeFileResult( request.Guid )
-                };
-                       
+            return FilterStoreToResponse(DataStore.DataStore.Instance().KnownApps, request.Guid);
         }
 
         public void Post(OtoFiles request)
@@ -66,58 +75,6 @@ namespace OtoServer
 
 
             }
-        }
-        private List<OtoFile> FakeFileResult( string guid )
-        {
-            List<OtoFile> results = new List<OtoFile>();
-            bool guid_set = ( guid != null && guid != "");
-            if( ! guid_set || guid == "{abcde}" )
-            {
-            results.Add(
-                new OtoFile{
-                    Name = "Station A Installer 1.0.1",
-                    Extension = ".msi",
-                    FileSizeBytes = 1024,
-                    Version = "1.0.1.0",
-                    ModifiedDate = new DateTime( 2013, 05,01,08,30,00)
-                }
-                );
-            results.Add(
-                new OtoFile{
-                    Name = "Station A Installer 1.0.2",
-                    Extension = ".msi",
-                    FileSizeBytes = 1024,
-                    Version = "1.0.2.1",
-                    ModifiedDate = new DateTime( 2013, 05,04,15,29,04)
-                }
-                );
-            }
-
-            if( ! guid_set || guid ==  "{fghij}" )
-            {
-                results.Add(
-                    new OtoFile
-                    {
-                        Name = "Station B Installer 2.8.32",
-                        Extension = ".msi",
-                        FileSizeBytes = 1024,
-                        Version = "2.8.32.1",
-                        ModifiedDate = new DateTime(2013, 05, 01, 08, 30, 00)
-                    }
-                    );
-                results.Add(
-                    new OtoFile
-                    {
-                        Name = "Station B Installer 2.8",
-                        Extension = ".msi",
-                        FileSizeBytes = 1024,
-                        Version = "2.8.0.0",
-                        ModifiedDate = new DateTime(2013, 01, 09, 10, 14, 37)
-                    }
-                );
-            }
-
-            return results;
         }
     }
 
