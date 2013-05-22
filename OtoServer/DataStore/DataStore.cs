@@ -44,12 +44,16 @@ namespace OtoServer.DataStore
         protected static DataStore instance = null;
         public static DataStore Instance() { return instance; }
         public abstract List<App> KnownApps { get; }
+        public abstract bool AddApp( string name, string guid );
+        public abstract bool AddAppVersion(string appguid, string appversion);
     }
 
 
     public interface IDataStore
     {
         List<App> KnownApps { get;}
+        bool AddApp(string name, string guid);
+        bool AddAppVersion(string appguid, string appversion);
     }
 
     public class TestDataStore : DataStore
@@ -62,6 +66,17 @@ namespace OtoServer.DataStore
             instance = new TestDataStore();
             ((TestDataStore)instance).TestPopulate();
         }
+
+        public override bool AddApp(string name, string guid)
+        {
+            return false;
+        }
+
+        public override bool AddAppVersion(string appguid, string appversion)
+        {
+            return false;
+        }
+
 
         public override List<App> KnownApps
         {

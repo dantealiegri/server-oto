@@ -24,28 +24,31 @@ namespace OtoServer
                 {
                     resp.breadcrumbnames.Add( display_name );
                     resp.breadcrumbs.Add(app.guid);
-                    foreach (DataStore.AppVersion version_of_app in app.versions)
+                    if (app.versions != null)
                     {
-                        if (version != null && version == version_of_app.version)
+                        foreach (DataStore.AppVersion version_of_app in app.versions)
                         {
-                            resp.breadcrumbnames.Add(version);
-                            resp.breadcrumbs.Add(version);
+                            if (version != null && version == version_of_app.version)
+                            {
+                                resp.breadcrumbnames.Add(version);
+                                resp.breadcrumbs.Add(version);
 
-                            OtoFile of = new OtoFile();
-                            of.Extension = "msi";
-                            of.FileSizeBytes = version_of_app.package[0].size;
-                            of.ModifiedDate = DateTime.Now;
-                            of.Name = version_of_app.package[0].name;
-                            if (resp.Files == null)
-                                resp.Files = new List<OtoFile>();
-                            resp.Files.Add(of);
-                        }
-                        else
-                        {
-                            if (resp.Containers == null)
-                                resp.Containers = new List<OtoContainer>();
-                            OtoContainer over = new OtoContainer { DisplayName = version_of_app.version, LinkName = version_of_app.version};
-                            resp.Containers.Add(over);
+                                OtoFile of = new OtoFile();
+                                of.Extension = "msi";
+                                of.FileSizeBytes = version_of_app.package[0].size;
+                                of.ModifiedDate = DateTime.Now;
+                                of.Name = version_of_app.package[0].name;
+                                if (resp.Files == null)
+                                    resp.Files = new List<OtoFile>();
+                                resp.Files.Add(of);
+                            }
+                            else
+                            {
+                                if (resp.Containers == null)
+                                    resp.Containers = new List<OtoContainer>();
+                                OtoContainer over = new OtoContainer { DisplayName = version_of_app.version, LinkName = version_of_app.version };
+                                resp.Containers.Add(over);
+                            }
                         }
                     }
                 }
@@ -68,17 +71,16 @@ namespace OtoServer
 
         public void Post(OtoFiles request)
         {
-
-
-            foreach (IFile uploadedFile in base.RequestContext.Files)
+            if (request.Guid != null && request.AppName != null)
             {
-                System.Console.WriteLine(
-                    String.Format("Uploading {0} [[1}] for {2} version {3}",
-                    uploadedFile.FileName, uploadedFile.ContentLength,
-                    request.Guid, request.Version));
-
-
+                DataStore.DataStore.Instance().AddApp(request.AppName, request.Guid);
             }
+            if (request.Guid != null && request.Version != null)
+            {
+                DataStore.DataStore.Instance().AddAppVersion(request.Guid, request.Version);
+            }
+
+
         }
     }
 

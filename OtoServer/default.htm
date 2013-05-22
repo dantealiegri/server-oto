@@ -18,9 +18,13 @@
     <div id="ls">
     </div>
     <div id="fileadmin">
-        <div class="mkdir ib">
-            <input id="dirname" placeholder="new folder name" /><a class="btn"><span>create folder</span></a></div>
-        <div class="upload ib">
+        <div id="appadmin" class="mkapp ib">
+            <input id="appname" placeholder="new application name" /><input id="appguid" placeholder="" /><a class="btn"><span>create application</span></a>
+        </div>
+        <div id="veradmin" class="mkver ib">
+            <input id="appver" placeholder="new version name" /><a class="btn"><span>create version</span></a>
+        </div>
+        <div id="verfileupload" class="upload ib">
             <input type="file" name="fileupload" id="fileupload" /><a class="btn"><span>upload here</span></a></div>
     </div>
   <div id="fileview">
@@ -84,18 +88,36 @@
 
         var href = "files", lastHref = "";
 
-        var mkdir = function () {
-            var dir = $("#dirname");
-            if (!dir.val()) {
-                alert("Enter the name of the folder first");
-                dir.focus();
+        var mkapp = function () {
+            var app = $("#appname");
+            var guid = $("#appguid");
+            if (!app.val()) {
+                alert("Enter the name of the application first");
+                app.focus();
                 return;
             }
-            $.post(href + "/" + dir.val(), null, function () { dir.val(''); refresh(); });
+            if (!guid.val()) {
+                alert("Enter the name of the application first");
+                app.focus();
+                return;
+            }
+            $.post(href + "/" + guid.val(), { AppName: app.val() }, function () { app.val(''); guid.val(''); refresh(); });
         };
 
-        $(".mkdir .btn").click(mkdir);
-        $(".mkdir INPUT").keypress(function (e) { if (e.which == '13') mkdir(); });
+        var mkver = function () {
+            var ver = $("#appver");
+            if (!ver.val()) {
+                alert("Enter the version of the application first");
+                ver.focus();
+                return;
+            }
+            $.post(href + "/" + ver.val(), function () { ver.val(''); refresh(); });
+        };
+
+        $(".mkapp .btn").click(mkapp);
+        $(".mkver .btn").click(mkver);
+        $(".mkapp INPUT").keypress(function (e) { if (e.which == '13') mkapp(); });
+        $(".mkver INPUT").keypress(function (e) { if (e.which == '13') mkver(); });
         $(".upload .btn").click(function () {
             var file = $("#fileupload").val();
             if (!file) {
@@ -136,6 +158,22 @@
                     : '<a href="#!' + bc_base + bc + '">' + r.breadcrumbnames[i] + '</a><b>/</b>';
                     bc_base += bc + "/";
                 }
+
+                if (r.breadcrumbs.length != 1)
+                    $("#appadmin").hide();
+                else
+                    $("#appadmin").show();
+
+                if (r.breadcrumbs.length != 2)
+                    $("#veradmin").hide();
+                else
+                    $("#veradmin").show();
+
+                if (r.breadcrumbs.length != 3)
+                    $("#verfileupload").hide();
+                else
+                    $("#verfileupload").show();
+
                 $("#breadcrumb").html(sb + "</div>");
                 //
                 var navBack = lastHref.length > href.length && lastHref.substr(0, href.length) == href,
