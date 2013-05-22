@@ -15,7 +15,7 @@ namespace OtoServer
         {
             public OtoApp() : base("Omaha Terminal Operator", typeof(OtoFiles).Assembly) 
             {
-                DataStore.DataStore.Initialize();
+                DataStore.RedisStore.Initialize();
             }
 
             public override void Configure(Funq.Container container)

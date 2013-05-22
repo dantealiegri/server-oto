@@ -7,52 +7,71 @@ namespace OtoServer.DataStore
 {
     public class App
     {
-        public string guid;
-        public string name;
-        public AppVersion current;
-        public List<AppVersion> versions;
+        public string guid { get; set; }
+        public string name { get; set; }
+        public AppVersion current { get; set; }
+        public List<AppVersion> versions { get; set; }
     }
 
     public class AppVersion
     {
-        public string version; // must be w.x.y.z
-        public List<string> url_locations;
-        public List<AppPackage> package;
-        public List<AppAction> actions;
+        public string version { get; set; } // must be w.x.y.z
+        public List<string> url_locations { get; set; }
+        public List<AppPackage> package { get; set; }
+        public List<AppAction> actions { get; set; }
     }
 
     public class AppPackage
     {
-        public string hash;
-        public string name;
-        public bool required;
-        public UInt32 size;
+        public string hash { get; set; }
+        public string name { get; set; }
+        public bool required { get; set; }
+        public UInt32 size { get; set; }
     }
 
     public class AppAction
     {
-        public string on_event;
-        public string run;
-        public string arguments;
-        public string version;
-        public string on_success;
+        public string on_event { get; set; }
+        public string run { get; set; }
+        public string arguments { get; set; }
+        public string version { get; set; }
+        public string on_success { get; set; }
     }
 
-    public class DataStore
+
+    public abstract class DataStore : IDataStore
     {
-        private static DataStore instance = null;
+        protected static DataStore instance = null;
+        public static DataStore Instance() { return instance; }
+        public abstract List<App> KnownApps { get; }
+    }
+
+
+    public interface IDataStore
+    {
+        List<App> KnownApps { get;}
+    }
+
+    public class TestDataStore : DataStore
+    {
+        private TestDataStore()
+        {
+        }
         public static void Initialize()
         {
-            instance = new DataStore();
-            instance.TestPopulate();
+            instance = new TestDataStore();
+            ((TestDataStore)instance).TestPopulate();
         }
 
-        public static DataStore Instance() { return instance; }
-
-        private DataStore()
+        public override List<App> KnownApps
         {
+            get
+            {
+                return _apps;
+            }
         }
 
+        private List<App> _apps;
         private void TestPopulate()
         {
             App omaha = new App
@@ -100,10 +119,8 @@ namespace OtoServer.DataStore
             };
             chrome.current = chrome.versions[0];
 
-            KnownApps = new List<App>(new App[] { omaha, chrome });
+            _apps = new List<App>(new App[] { omaha, chrome });
 
         }
-
-        public List<App> KnownApps;
     }
 }
