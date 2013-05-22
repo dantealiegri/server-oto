@@ -23,7 +23,7 @@ namespace OtoServer
         public List<string> breadcrumbnames { get; set; }
 
         public List<OtoFile> Files { get; set; }
-        public List<OtoApplication> Applications { get; set; }
+        public List<OtoContainer> Containers { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -36,7 +36,7 @@ namespace OtoServer
         public DateTime ModifiedDate { get; set; }
     }
 
-    public class OtoApplication
+    public class OtoContainer
     {
         public string DisplayName { get; set; }
         public string LinkName { get; set; }
