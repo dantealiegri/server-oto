@@ -32,15 +32,20 @@ namespace OtoServer
                             {
                                 resp.breadcrumbnames.Add(version);
                                 resp.breadcrumbs.Add(version);
+                                if( version_of_app.package != null )
 
-                                OtoFile of = new OtoFile();
-                                of.Extension = "msi";
-                                of.FileSizeBytes = version_of_app.package[0].size;
-                                of.ModifiedDate = DateTime.Now;
-                                of.Name = version_of_app.package[0].name;
-                                if (resp.Files == null)
-                                    resp.Files = new List<OtoFile>();
-                                resp.Files.Add(of);
+                                    foreach (DataStore.AppPackage pkg in version_of_app.package)
+                                    {
+
+                                        OtoFile of = new OtoFile();
+                                        of.Extension = "msi";
+                                        of.FileSizeBytes = pkg.size;
+                                        of.ModifiedDate = DateTime.Now;
+                                        of.Name = pkg.name;
+                                        if (resp.Files == null)
+                                            resp.Files = new List<OtoFile>();
+                                        resp.Files.Add(of);
+                                    }
                             }
                             else
                             {
@@ -75,10 +80,16 @@ namespace OtoServer
             {
                 DataStore.DataStore.Instance().AddApp(request.AppName, request.Guid);
             }
-            if (request.Guid != null && request.Version != null)
+            
+            if (request.Guid != null && request.Version != null && RequestContext.Files.Length == 0)
             {
                 DataStore.DataStore.Instance().AddAppVersion(request.Guid, request.Version);
             }
+            if (request.Guid != null && request.Version != null && RequestContext.Files.Length > 0)
+            {
+                DataStore.DataStore.Instance().AddAppVersionFile(request.Guid, request.Version, RequestContext.Files);
+            }
+
 
 
         }

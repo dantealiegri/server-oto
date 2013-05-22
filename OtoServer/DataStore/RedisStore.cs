@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack.Redis;
+using ServiceStack.ServiceHost;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace OtoServer.DataStore
 {
@@ -27,19 +30,24 @@ namespace OtoServer.DataStore
 
     public class RedisStore : DataStore
     {
-        public static void Initialize()
+        public static void Initialize( AppConfig config )
         {
-            instance = new RedisStore();
+            instance = new RedisStore( config );
         }
 
         private RedisClient _client;
+        private AppConfig _config;
         //private List<App> _cached;
         private Dictionary<object,App> _cached;
+        private Dictionary<string, Dictionary<string, object>> _cached_version_keys; // by guid, version mapped to id.
+        private SHA1 hasher;
 
-        private RedisStore()
+        private RedisStore( AppConfig config )
         {
+            hasher = new SHA1Managed();
+            _config = config;
             _client = new RedisClient();
-            _cached = null;
+            _cached = null; _cached_version_keys = null;
             // DeleteAll and AddDemoApps are for testing.
 
             //_client.DeleteAll<RedisApp>();
@@ -47,7 +55,7 @@ namespace OtoServer.DataStore
             if( KnownApps.Count == 0 )
             {
                 AddDemoApps();
-                _cached = null;
+                _cached = null; _cached_version_keys = null;
             }
 
         }
@@ -73,6 +81,7 @@ namespace OtoServer.DataStore
                     r_apps = app_redis.GetAll();
                 }
 
+                _cached_version_keys = new Dictionary<string, Dictionary<string, object>>();
                 using (var version_redis = _client.As<RedisAppVersion>())
                 {
                     foreach (RedisAppVersion rv in version_redis.GetAll())
@@ -88,6 +97,11 @@ namespace OtoServer.DataStore
                         current = app.current_id == 0 ? null : r_version[app.current_id],
                         versions = r_version.Where( kvp => app.version_ids !=null && app.version_ids.Contains(kvp.Key)).Select( kvp => kvp.Value ).ToList()
                     };
+                    _cached_version_keys[app.guid] = new Dictionary<string, object>();
+                    foreach( KeyValuePair<long,AppVersion> pair in r_version.Where( kvp => app.version_ids != null && app.version_ids.Contains( kvp.Key )))
+                    {
+                        _cached_version_keys[app.guid][pair.Value.version] = pair.Key;
+                    }
 
 
                     apps[ app.Id ] = translated;
@@ -104,7 +118,7 @@ namespace OtoServer.DataStore
             {
                 RedisApp new_app = new RedisApp { Id = redis_app.GetNextSequence(), name = appname, guid = appguid };
                 redis_app.Store(new_app);
-                _cached = null;
+                _cached = null; _cached_version_keys = null;
             }
 
             return true;
@@ -128,7 +142,39 @@ namespace OtoServer.DataStore
                     current_app.version_ids = new List<long>();
                 current_app.version_ids.Add(new_version.Id);
                 redis_app.Store(current_app);
-                _cached = null;
+                _cached = null; _cached_version_keys = null;
+            }
+
+            return true;
+        }
+
+        public override bool AddAppVersionFile(string appguid, string appversion, IFile[] files)
+        {
+            if ( ! KnownApps.Select(ka => ka.guid).Contains(appguid))
+                return false;
+
+            if (! KnownApps.Single(ka => ka.guid == appguid).versions.Select(av => av.version).Contains(appversion))
+                return false;
+
+            var targetDir = new FileInfo( Path.Combine( _config.RootDirectory, appguid + "/"+appversion));
+
+            if (!Directory.Exists(targetDir.FullName))
+                Directory.CreateDirectory(targetDir.FullName);
+
+            using( var redis_version = _client.As<RedisAppVersion>() )
+            {
+                RedisAppVersion this_version = redis_version.GetById(_cached_version_keys[appguid][appversion]);
+                foreach (IFile file in files)
+                {
+                    string sha1hash = Convert.ToBase64String(hasher.ComputeHash(file.InputStream));
+                    file.InputStream.Seek(0, SeekOrigin.Begin);
+                    if (this_version.package == null)
+                        this_version.package = new List<AppPackage>();
+                    this_version.package.Add(new AppPackage { size = (uint)file.ContentLength, name = file.FileName, required = true, hash = sha1hash });
+                    file.SaveTo(Path.Combine(targetDir.FullName, file.FileName));
+                }
+                redis_version.Store(this_version);
+                _cached = null; _cached_version_keys = null;
             }
 
             return true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ServiceStack.ServiceHost;
 
 namespace OtoServer.DataStore
 {
@@ -46,6 +47,7 @@ namespace OtoServer.DataStore
         public abstract List<App> KnownApps { get; }
         public abstract bool AddApp( string name, string guid );
         public abstract bool AddAppVersion(string appguid, string appversion);
+        public abstract bool AddAppVersionFile(string appguid, string appversion, IFile[] files);
     }
 
 
@@ -54,6 +56,7 @@ namespace OtoServer.DataStore
         List<App> KnownApps { get;}
         bool AddApp(string name, string guid);
         bool AddAppVersion(string appguid, string appversion);
+        bool AddAppVersionFile(string appguid, string appversion, IFile[] files);
     }
 
     public class TestDataStore : DataStore
@@ -73,6 +76,11 @@ namespace OtoServer.DataStore
         }
 
         public override bool AddAppVersion(string appguid, string appversion)
+        {
+            return false;
+        }
+
+        public override bool AddAppVersionFile(string appguid, string appversion, IFile[] files)
         {
             return false;
         }

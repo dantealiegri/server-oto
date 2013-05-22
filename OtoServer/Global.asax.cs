@@ -13,9 +13,11 @@ namespace OtoServer
     {
         public class OtoApp : AppHostBase
         {
+            private AppConfig config;
             public OtoApp() : base("Omaha Terminal Operator", typeof(OtoFiles).Assembly) 
             {
-                DataStore.RedisStore.Initialize();
+                config = new AppConfig( new ConfigurationResourceManager());
+                DataStore.RedisStore.Initialize(config);
             }
 
             public override void Configure(Funq.Container container)
@@ -28,8 +30,7 @@ namespace OtoServer
                             { "Access-Control-Allow-Methods", "GET,POST" }
                         }
                     });
-                var otoConfig = new AppConfig( new ConfigurationResourceManager());
-                container.Register(otoConfig);
+                container.Register(config);
 
                 // if no directory, add.
             }
