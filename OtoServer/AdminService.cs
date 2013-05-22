@@ -14,7 +14,7 @@ namespace OtoServer
         private OtoFilesResponse FilterStoreToResponse( List<DataStore.App> apps, string guid, string version )
         {
             OtoFilesResponse resp = new OtoFilesResponse();
-            resp.breadcrumbs = new List<string>(new string[] { "/files" });
+            resp.breadcrumbs = new List<string>(new string[] { "files" });
             resp.breadcrumbnames = new List<string>(new string[] { "Applications" });
 
             foreach (DataStore.App app in apps)
