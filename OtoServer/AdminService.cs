@@ -16,6 +16,8 @@ namespace OtoServer
             OtoFilesResponse resp = new OtoFilesResponse();
             resp.breadcrumbs = new List<string>(new string[] { "files" });
             resp.breadcrumbnames = new List<string>(new string[] { "Applications" });
+            bool want_version = version != null && version != "";
+            bool found_version = false;
 
             foreach (DataStore.App app in apps)
             {
@@ -30,6 +32,7 @@ namespace OtoServer
                         {
                             if (version != null && version == version_of_app.version)
                             {
+                                found_version = true;
                                 resp.breadcrumbnames.Add(version);
                                 resp.breadcrumbs.Add(version);
                                 if( version_of_app.package != null )
@@ -67,10 +70,23 @@ namespace OtoServer
 
                 }
             }
+
+            if (want_version && !found_version)
+            {
+                throw HttpError.NotFound( String.Format("Application {0}, version {1} not found", guid, version));
+            }
             return resp;
+        }
+
+        private object RetrieveFileFromStore(string guid, string version, string file)
+        {
+            return DataStore.DataStore.Instance().GetAppVersionFile(guid, version, file);
         }
         public object Get( OtoFiles request )
         {
+            if( request.File != null && request.File != "" )
+                return RetrieveFileFromStore(request.Guid, request.Version, request.File );
+            else
             return FilterStoreToResponse(DataStore.DataStore.Instance().KnownApps, request.Guid, request.Version);
         }
 
@@ -89,8 +105,6 @@ namespace OtoServer
             {
                 DataStore.DataStore.Instance().AddAppVersionFile(request.Guid, request.Version, RequestContext.Files);
             }
-
-
 
         }
     }

@@ -6,6 +6,7 @@ using ServiceStack.Redis;
 using ServiceStack.ServiceHost;
 using System.Security.Cryptography;
 using System.IO;
+using ServiceStack.Common.Web;
 
 namespace OtoServer.DataStore
 {
@@ -178,6 +179,24 @@ namespace OtoServer.DataStore
             }
 
             return true;
+        }
+
+        public override object GetAppVersionFile(string appguid, string appversion, string filename)
+        {
+            var targetDir = new FileInfo( Path.Combine( _config.RootDirectory, appguid + "/"+appversion));
+
+            if (!Directory.Exists(targetDir.FullName))
+            {
+                throw HttpError.NotFound( String.Format("Application {0}, version {1} not found.", appguid, appversion ));
+            }
+            var targetFile = new FileInfo(Path.Combine(targetDir.FullName, filename));
+            if ( ! targetFile.Exists)
+            {
+                throw HttpError.NotFound( String.Format("No such file {2} in Application {0}, version {1}.", appguid, appversion, filename ));
+            }
+
+            return new HttpResult(new MemoryStream(File.ReadAllBytes(targetFile.FullName)), "application/octect-stream");
+
         }
     
         private void AddDemoApps()

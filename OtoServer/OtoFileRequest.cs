@@ -11,10 +11,12 @@ namespace OtoServer
     [Route("/files")]
     [Route("/files/{Guid}")]
     [Route("/files/{Guid}/{Version}")]
+    [Route("/files/{Guid}/{Version}/{File}")]
     public class OtoFiles
     {
         public string Version { get; set; }
         public string Guid { get; set; }
+        public string File { get; set; }
         public string AppName { get; set; }
     }
 
