@@ -84,6 +84,9 @@
             },
             del: function (url, data, callback, type) {
                 return _mkAjax(url, data, callback, type, 'DELETE');
+            },
+            setdefault: function(url,data,callback,type ) {
+                return _mkAjax(url,data,callback,type,'PUT');
             }
         });
 
@@ -202,6 +205,11 @@
 
                 if (apps) {
                     $.each(apps, function (i, app) {
+                    if (r.breadcrumbs.length == 2)
+                        sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='verset' href='#!setversiondefault'></b></a></td><td>"
+                        + " Just Noww" + "</td><td>"
+                        + "items</td>";
+                    else
                         sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "</a></td></td>";
                     });
                 }
@@ -242,7 +250,13 @@
                     return;
                 }
                 refresh();
+            },
+            setversiondefault: function (el) {
+                var verHref = $(el.parentNode).attr('href').substr(2);
+                $.setdefault(verHref, { VersionDefault: 'true' }, refresh);
+                href = dirPath(verHref); location.hash = '#!' + href;
             }
+
         }
 
         $(document).click(function (e) {

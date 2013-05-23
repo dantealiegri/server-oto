@@ -140,6 +140,7 @@
     </Compile>
     <Compile Include="AdminService.cs" />
     <Compile Include="AppConfig.cs" />
+    <Compile Include="DataStore\ApplicationVersion.cs" />
     <Compile Include="DataStore\DataStore.cs" />
     <Compile Include="DataStore\RedisStore.cs" />
     <Compile Include="Global.asax.cs">

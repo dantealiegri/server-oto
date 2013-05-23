@@ -8,6 +8,7 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceHost;
 
 using OtoServer.Omaha.V3;
+using System.Text.RegularExpressions;
 
 namespace OtoServer
 {
@@ -66,7 +67,7 @@ namespace OtoServer
                 {
                     UpdateResult update_result = null;
                     DataStore.App matched = DataStore.DataStore.Instance().KnownApps.SingleOrDefault(k_app => k_app.guid == app_req.appid);
-                    if (matched == null || matched.current.version == app_req.version)
+                    if (matched == null || matched.current == null || !VersionShouldUpdate( app_req.version, matched.current.version))
                     {
                         update_result = new UpdateResult { status = "noupdate" };
                     }
@@ -76,7 +77,7 @@ namespace OtoServer
                             version = matched.current.version,
                             updated_packages = matched.current.package.Select<DataStore.AppPackage,UpdatePackage>(
                                 ap => new UpdatePackage { hash = ap.hash, name = ap.name, required = ap.required ? "true":"false", size = ap.size } ).ToList(),
-                            update_actions = matched.current.actions.Select<DataStore.AppAction,UpdateAction>(
+                            update_actions = matched.current.actions == null ? null : matched.current.actions.Select<DataStore.AppAction,UpdateAction>(
                                 aa => new UpdateAction { on_event = aa.on_event, arguments = aa.arguments, run = aa.run, onsuccess = aa.on_success, version = aa.version }).ToList()
                         };
                         List<UpdateUrl> url_list = matched.current.url_locations.Select<string,UpdateUrl>(url_string => new UpdateUrl { codebase = url_string }).ToList();
@@ -93,6 +94,13 @@ namespace OtoServer
 
             return resp;
 
+        }
+
+        private bool VersionShouldUpdate(string supplied_version, string repo_version)
+        {
+            DataStore.VersionTuple supplied = new DataStore.VersionTuple(supplied_version);
+            DataStore.VersionTuple repo = new DataStore.VersionTuple(repo_version);
+            return supplied < repo;
         }
 
     }

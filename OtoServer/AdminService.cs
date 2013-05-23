@@ -89,6 +89,14 @@ namespace OtoServer
             else
             return FilterStoreToResponse(DataStore.DataStore.Instance().KnownApps, request.Guid, request.Version);
         }
+        public object Put(OtoFiles request)
+        {
+            if (request.Guid != "" && request.Version != "" && request.VersionDefault == "true")
+            {
+                DataStore.DataStore.Instance().SetAppDefaultVersion(request.Guid, request.Version);
+            }
+            return HttpError.NotFound("Could not PUT this version request");
+        }
 
         public void Post(OtoFiles request)
         {

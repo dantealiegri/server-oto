@@ -11,6 +11,7 @@ namespace OtoServer
     public class AppConfig
     {
         public string RootDirectory { get; set; }
+        public string RootUrl { get; set; }
 
         public AppConfig()
         {
@@ -19,6 +20,7 @@ namespace OtoServer
         public AppConfig(IResourceManager resources)
         {
             this.TextFileExtensions = resources.GetList("TextFileExtensions");
+            this.RootUrl = resources.GetString("RootUrl");
             this.RootDirectory = resources.GetString("RootDirectory").MapHostAbsolutePath().MapHostAbsolutePath()
                 .Replace('\\', Path.DirectorySeparatorChar);
         }

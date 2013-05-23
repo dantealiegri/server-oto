@@ -7,6 +7,7 @@ using ServiceStack.ServiceHost;
 using System.Security.Cryptography;
 using System.IO;
 using ServiceStack.Common.Web;
+using ServiceStack.WebHost.Endpoints;
 
 namespace OtoServer.DataStore
 {
@@ -125,7 +126,7 @@ namespace OtoServer.DataStore
             return true;
         }
 
-        public override bool AddAppVersion(string appguid, string appversion)
+        public override bool AddAppVersion(string appguid, string appversion )
         {
             if ( ! KnownApps.Select(ka => ka.guid).Contains(appguid))
                 return false;
@@ -136,7 +137,8 @@ namespace OtoServer.DataStore
             using (var redis_ver = _client.As<RedisAppVersion>())
             using (var redis_app = _client.As<RedisApp>())
             {
-                RedisAppVersion new_version = new RedisAppVersion { Id = redis_app.GetNextSequence(), version = appversion };
+                RedisAppVersion new_version = new RedisAppVersion { Id = redis_app.GetNextSequence(), version = appversion,
+                    url_locations = new List<string>(new string[] { _config.RootUrl + "files/"+appguid+"/"+appversion+"/" }) };
                 redis_ver.Store(new_version);
                 RedisApp current_app = redis_app.GetById(_cached.Single(kvp => kvp.Value.guid == appguid).Key);
                 if (current_app.version_ids == null)
@@ -197,6 +199,26 @@ namespace OtoServer.DataStore
 
             return new HttpResult(new MemoryStream(File.ReadAllBytes(targetFile.FullName)), "application/octect-stream");
 
+        }
+
+        public override bool SetAppDefaultVersion(string appguid, string appversion)
+        {
+            if ( ! KnownApps.Select(ka => ka.guid).Contains(appguid))
+                return false;
+
+            if (! KnownApps.Single(ka => ka.guid == appguid).versions.Select(av => av.version).Contains(appversion))
+                return false;
+
+            using (var redis_ver = _client.As<RedisAppVersion>())
+            using (var redis_app = _client.As<RedisApp>())
+            {
+                RedisApp this_app = redis_app.GetById(_cached.Single(kvp => kvp.Value.guid == appguid).Key);
+                RedisAppVersion this_version = redis_ver.GetById(_cached_version_keys[appguid][appversion]);
+                this_app.current_id = this_version.Id;
+                redis_app.Store(this_app);
+                _cached = null; _cached_version_keys = null;
+            }
+            return true;
         }
     
         private void AddDemoApps()

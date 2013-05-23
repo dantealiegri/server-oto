@@ -49,6 +49,7 @@ namespace OtoServer.DataStore
         public abstract bool AddAppVersion(string appguid, string appversion);
         public abstract bool AddAppVersionFile(string appguid, string appversion, IFile[] files);
         public abstract object GetAppVersionFile(string appguid, string appversion, string filename);
+        public abstract bool SetAppDefaultVersion(string appguid, string appversion);
     }
 
 
@@ -59,6 +60,7 @@ namespace OtoServer.DataStore
         bool AddAppVersion(string appguid, string appversion);
         bool AddAppVersionFile(string appguid, string appversion, IFile[] files);
         object GetAppVersionFile(string appguid, string appversion, string filename);
+        bool SetAppDefaultVersion(string appguid, string appversion);
     }
 
     public class TestDataStore : DataStore
@@ -70,6 +72,11 @@ namespace OtoServer.DataStore
         {
             instance = new TestDataStore();
             ((TestDataStore)instance).TestPopulate();
+        }
+
+        public override bool SetAppDefaultVersion(string appguid, string appversion)
+        {
+            return false;
         }
 
         public override bool AddApp(string name, string guid)

@@ -17,6 +17,7 @@ namespace OtoServer
         public string Version { get; set; }
         public string Guid { get; set; }
         public string File { get; set; }
+        public string VersionDefault { get; set; }
         public string AppName { get; set; }
     }
 
