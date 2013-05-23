@@ -205,12 +205,20 @@
 
                 if (apps) {
                     $.each(apps, function (i, app) {
-                    if (r.breadcrumbs.length == 2)
-                        sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='verset' href='#!setversiondefault'></b></a></td><td>"
-                        + " Just Noww" + "</td><td>"
-                        + "items</td>";
-                    else
-                        sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "</a></td></td>";
+                        if (r.breadcrumbs.length == 2) {
+                            if (app.IsCurrentVersion == "true") {
+                                sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='curver'></b></a></td><td>"
+                                + " Just Noww" + "</td><td>"
+                                + "items</td>";
+                            }
+                            else {
+                                sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='verset' href='#!setversiondefault'></b></a></td><td>"
+                                + " Just Noww" + "</td><td>"
+                                + "items</td>";
+                            }
+                        }
+                        else
+                            sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "</a></td></td>";
                     });
                 }
 

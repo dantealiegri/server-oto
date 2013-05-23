@@ -54,7 +54,9 @@ namespace OtoServer
                             {
                                 if (resp.Containers == null)
                                     resp.Containers = new List<OtoContainer>();
-                                OtoContainer over = new OtoContainer { DisplayName = version_of_app.version, LinkName = version_of_app.version };
+                                OtoContainer over = new OtoContainer { DisplayName = version_of_app.version, LinkName = version_of_app.version,
+                                IsCurrentVersion = app.current != null && app.current.version == version_of_app.version ? "true" : "false"
+                                };
                                 resp.Containers.Add(over);
                             }
                         }

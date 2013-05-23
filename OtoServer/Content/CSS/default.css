@@ -1,7 +1,7 @@
 /*  HTML5 ✰ Boilerplate  */
 
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
+abbr, address, curver, cite, code, del, dfn, em, img, ins, kbd, q, samp,
 small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, figcaption, figure,  footer, header, hgroup, 
@@ -288,6 +288,14 @@ B.verset
     display: block;
 }
 
+B.curver
+{
+    float: right;
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
 A.file:hover B.del
 {
     background: url(../Images/delete_icon.png) no-repeat 0px 100%;
@@ -297,6 +305,13 @@ A.dir:hover B.verset
 {
     background: url(../Images/set_current.png) no-repeat 0px 100%;
 }
+
+a.dir B.curver
+{
+    background: url(../Images/current_version.png) no-repeat 0px 100%;
+}
+
+
 #ls TABLE TD A:hover
 {
     text-decoration: underline;

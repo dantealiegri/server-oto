@@ -44,5 +44,6 @@ namespace OtoServer
     {
         public string DisplayName { get; set; }
         public string LinkName { get; set; }
+        public string IsCurrentVersion { get; set; }
     }
 }
