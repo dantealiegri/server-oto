@@ -74,8 +74,8 @@ namespace OtoServer.Omaha
                     }
                 }
 
-                r.Read();
-                r.ReadAttributeValue();
+                //r.Read();
+                //r.ReadAttributeValue();
             }
 
             public void WriteXml(XmlWriter w)
@@ -138,7 +138,7 @@ namespace OtoServer.Omaha
             public string lang;
             public string brand;
             public string client;
-            public uint installage;
+            public int installage;
 
             public UpdateCheck updatecheck;
             public PingRequest ping;
@@ -159,7 +159,7 @@ namespace OtoServer.Omaha
                     else if (r.Name == "lang") lang = r.Value;
                     else if (r.Name == "brand") brand = r.Value;
                     else if (r.Name == "client") client = r.Value;
-                    else if (r.Name == "installage") installage = UInt32.Parse(r.Value);
+                    else if (r.Name == "installage") installage = Int32.Parse(r.Value);
                 }
 
                 while (r.Read())
