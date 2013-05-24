@@ -6,6 +6,8 @@ using System.Web.Security;
 using System.Web.SessionState;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
+using ServiceStack.Logging.Log4Net;
 
 namespace OtoServer
 {
@@ -18,6 +20,7 @@ namespace OtoServer
             {
                 config = new AppConfig( new ConfigurationResourceManager());
                 DataStore.RedisStore.Initialize(config);
+                LogManager.LogFactory = new Log4NetFactory(true);
             }
 
             public override void Configure(Funq.Container container)

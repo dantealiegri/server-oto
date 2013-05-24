@@ -23,6 +23,10 @@ namespace OtoServer
         }
         public object Post(OmahaClient request)
         {
+            ILog log = LogManager.GetLogger(GetType());
+            log.Info("Client is : " + Request.UserAgent);
+            log.Debug("Query is : " + Request.GetRawBody());
+            //log.Warn("Response Content Type: " + Request.ResponseContentType);
             OmahaClientResponse resp = new OmahaClientResponse();
             resp.protocol = "3.0";
             resp.server = "oto-test";
