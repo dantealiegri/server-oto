@@ -8,6 +8,7 @@ using ServiceStack.WebHost.Endpoints;
 using ServiceStack.Configuration;
 using ServiceStack.Logging;
 using ServiceStack.Logging.Log4Net;
+using System.Text;
 
 namespace OtoServer
 {
@@ -25,6 +26,26 @@ namespace OtoServer
 
             public override void Configure(Funq.Container container)
             {
+#if false
+                this.RequestFilters.Add((hreq, hreq2, dto) =>
+                    {
+                        byte[] rdata = new byte[hreq.ContentLength + 10];
+                        ILog l = LogManager.GetLogger(GetType());
+                        l.Debug("Content Length is " + hreq.ContentLength);
+                        hreq.InputStream.Seek(0, System.IO.SeekOrigin.Begin);
+                        hreq.InputStream.Read(rdata, 0, (int)hreq.ContentLength);
+                        //hreq.InputStream.Read( rdata,0,hreq.ContentLength);
+                        l.Debug("Full? " + Encoding.UTF8.GetString( rdata ));
+                        l.Debug("Headers");
+                        foreach (string k in new List<String>(hreq.Headers.AllKeys))
+                        {
+                            l.Debug(k + " : " + hreq.Headers[k]);
+
+                        }
+
+
+                    });
+#endif
                 SetConfig(
                     new EndpointHostConfig
                     {
