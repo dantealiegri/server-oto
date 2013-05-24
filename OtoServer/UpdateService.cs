@@ -23,11 +23,27 @@ namespace OtoServer
             resp.daystart = new DayStart { elapsed_seconds = (uint)(DateTime.Now - beginning_of_day).TotalSeconds };
             return resp;
         }
+        private byte[] rdata = new byte[4096];
+        private static DataContractSerializer client_serializer = new DataContractSerializer(typeof(OmahaClient));
         public object Post(OmahaClient request)
         {
             ILog log = LogManager.GetLogger(GetType());
             log.Info("Client is : " + Request.UserAgent);
-            log.Debug("Query is : " + Request.GetRawBody());
+            //log.Debug("Query is : " + Request.GetRawBody());
+            //log.Debug("Query is : " + Request.InputStream.Length + " is at " + Request.InputStream.Position);
+            //log.Debug("?? " + Request.QueryString);
+
+            if (Request.ContentType == null || Request.ContentType == "")
+            {
+                string rb = Request.GetRawBody();
+                XmlTextReader sxtr = new XmlTextReader(new StringReader(rb));
+                //log.Warn("Thus, have " + request.protocol + " and " + rb);
+                log.Warn("No ContentType supplied. Reparsing data as xml.");
+                request = client_serializer.ReadObject(sxtr) as OmahaClient;
+
+            }
+            //else
+            //    log.Info("Client Content Type was " + Request.ContentType);
             if (Request.AcceptTypes == null)
                 log.Warn("No Accept Types - forcing application/xml out.");
             else
