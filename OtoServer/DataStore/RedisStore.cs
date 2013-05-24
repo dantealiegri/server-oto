@@ -94,7 +94,7 @@ namespace OtoServer.DataStore
                 {
                     App translated = new App
                     {
-                        guid = app.guid,
+                        guid = app.guid.ToUpper(),
                         name = app.name,
                         current = app.current_id == 0 ? null : r_version[app.current_id],
                         versions = r_version.Where( kvp => app.version_ids !=null && app.version_ids.Contains(kvp.Key)).Select( kvp => kvp.Value ).ToList()

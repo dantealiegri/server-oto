@@ -11,6 +11,10 @@ using OtoServer.Omaha.V3;
 using System.Text.RegularExpressions;
 using ServiceStack.Logging;
 using ServiceStack.Logging.Log4Net;
+using System.Text;
+using System.Xml;
+using System.Runtime.Serialization;
+using System.IO;
 
 namespace OtoServer
 {
@@ -98,6 +102,8 @@ namespace OtoServer
 
                     if (app_req.updatecheck != null)
                     {
+                        if (app_req.version != null)
+                            app_req.version = app_req.version.ToUpper();
                         UpdateResult update_result = null;
                         DataStore.App matched = DataStore.DataStore.Instance().KnownApps.SingleOrDefault(k_app => k_app.guid == app_req.appid);
                         if (matched == null || matched.current == null || !VersionShouldUpdate(app_req.version, matched.current.version))
