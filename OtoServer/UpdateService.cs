@@ -86,7 +86,12 @@ namespace OtoServer
                         DataStore.App matched = DataStore.DataStore.Instance().KnownApps.SingleOrDefault(k_app => k_app.guid == app_req.appid);
                         if (matched == null || matched.current == null || !VersionShouldUpdate(app_req.version, matched.current.version))
                         {
-                            log.Info( app_req.appid +" had no update");
+                            if (matched == null)
+                                log.Info("Requested unknown application " + app_req.appid);
+                            else if( matched.current == null )
+                                log.Warn("Requested application " + app_req.appid + " has no active version!" );
+                            else
+                                log.Info( app_req.appid + " version \"" + app_req.version + "\" had no update");
                             update_result = new UpdateResult { status = "noupdate" };
                         }
                         else
@@ -121,6 +126,7 @@ namespace OtoServer
 
         private bool VersionShouldUpdate(string supplied_version, string repo_version)
         {
+            if ( supplied_version == null ||  supplied_version == "") return true;
             DataStore.VersionTuple supplied = new DataStore.VersionTuple(supplied_version);
             DataStore.VersionTuple repo = new DataStore.VersionTuple(repo_version);
             return supplied < repo;
