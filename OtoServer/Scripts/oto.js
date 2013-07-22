@@ -2,6 +2,8 @@ var app = angular.module('oto' , ['restangular']).
   config(function($routeProvider, RestangularProvider) {
 	  $routeProvider.
 	  when('/', { controller:AppCtrl,templateUrl:'app.html' }).
+	  when('/files/:uuid', { controller:VersionCtrl,templateUrl:'version.html' }).
+	  when('/files/:uuid/:version', { controller:VersionFileCtrl,templateUrl:'verfiles.html' }).
 	  otherwise({redirectTo:'/'});
 	  RestangularProvider.setBaseUrl("/oto");
 	  RestangularProvider.setRestangularFields({
@@ -10,6 +12,7 @@ var app = angular.module('oto' , ['restangular']).
 	  RestangularProvider.setResponseExtractor(function(response,operation) {
 		  var newResponse;
 		  newResponse = response.Containers;
+		  angular.forEach( newResponse, function(array_item) { array_item["LinkName"] = "#/"+ response.breadcrumbs.join("/") + "/"+ array_item["LinkName"]; });
 		  newResponse.trail = { names : response.breadcrumbnames , links :response.breadcrumbs }
 		  console.log( "Response: " + JSON.stringify(response));
 		  console.log( "Operation:" + operation);
@@ -17,7 +20,19 @@ var app = angular.module('oto' , ['restangular']).
 		  console.log( "Modified Trail: " + JSON.stringify(newResponse.trail))
 		  return newResponse;
 	  });
-  });
+  })
+
+app.factory('AppFileRestangular', function(Restangular) {
+	return Restangular.withConfig( function( RestangularConfigurer ) {
+		RestangularConfigurer.setResponseExtractor(function(response,operation) {
+			var newResponse;
+			newResponse = response.Files;
+			console.log( "Response: " + JSON.stringify(response));
+			return newResponse
+		});
+	})
+});
+	
 
 
 
@@ -26,6 +41,21 @@ function AppCtrl($scope,Restangular) {
 	$scope.oto_data.then(function(files) {
 		console.log("Files Loaded: " +  JSON.stringify(files));
 	});
+}
+
+function VersionCtrl($scope,$location,$routeParams,Restangular) {
+	console.log("Version Control: " );
+	$scope.oto_single_app = Restangular.one("files", $routeParams.uuid).getList()
+	$scope.oto_single_app.then(function(files) {
+			console.log("App loaded versions: " + JSON.stringify(files))
+		});
+}
+
+function VersionFileCtrl($scope,$location,$routeParams,AppFileRestangular) {
+	$scope.oto_app_ver = AppFileRestangular.one("files", $routeParams.uuid).customGET($routeParams.version); //.getList()
+	$scope.oto_app_ver.then(function(files) {
+			console.log("App loaded files: " + JSON.stringify(files))
+		});
 }
 
 
