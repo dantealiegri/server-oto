@@ -1,16 +1,19 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>OTO</title>
-        <link rel="stylesheet" type="text/css" href="Content/Css/default.css" />
-    <script type="text/javascript" src="Scripts/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="Scripts/ajaxfileupload.js"></script>
-</head>
+﻿<!DOCTYPE html >
+<html ng-app="oto">
+	<head>
+		<title>Google Omaha Update Server [[OTO]] 1.0 </title>
+		<link rel="stylesheet" type="text/css" href="Content/Css/default.css" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js"></script>
+		<script type="text/javascript" src="Scripts/underscore-min.js"></script>
+		<script type="text/javascript" src="http://cdn.jsdelivr.net/restangular/latest/restangular.js"></script>
+		<script type="text/javascript" src="Scripts/oto.js"></script>
+	</head>
 <body>
 
 <div id="info">
     <h3>
-    GitHub-like OTO server
+	    Google Omaha Update Server - Control Interface [[OTO]]
     </h3>
 </div>
     <a id="btn-reset" href="#!revertfiles" class="btn"><span>revert files</span></a>
@@ -18,278 +21,14 @@
     </div>
     <div id="ls">
     </div>
-    <div id="fileadmin">
-        <div id="appadmin" class="mkapp ib">
-            <input id="appname" placeholder="new application name" /><input id="appguid" placeholder="" /><a class="btn"><span>create application</span></a>
-        </div>
-        <div id="veradmin" class="mkver ib">
-            <input id="appver" placeholder="new version name" /><a class="btn"><span>create version</span></a>
-        </div>
-        <div id="verfileupload" class="upload ib">
-            <input type="file" name="fileupload" id="fileupload" /><a class="btn"><span>upload here</span></a></div>
-    </div>
+    <div ng-view></div>
   <div id="fileview">
   </div>
   <div id="footer">
       <div id="disclaimer">
-        *Not responsible for eaten shoes.
+	      Omaha is used courtesy of Google.
       </div>
   </div>
 
-  <script>
-       $.ajaxSetup({ cache: false, dataType: 'json' });
-
-       function fromDtoDate(dateStr) {
-            return new Date(parseFloat(/Date\(([^)]+)\)/.exec(dateStr)[1]));
-        }
-
-        function toTwitterTime(a) {
-            var b = new Date();
-            var c = typeof a == "date" ? a : new Date(a);
-            var d = b - c;
-            var e = 1000, minute = e * 60, hour = minute * 60, day = hour * 24, week = day * 7;
-            if (isNaN(d) || d < 0) { return "" }
-            if (d < e * 7) { return "right now" }
-            if (d < minute) { return Math.floor(d / e) + " secs ago" }
-            if (d < minute * 2) { return "about 1 min ago" }
-            if (d < hour) { return Math.floor(d / minute) + " mins ago" }
-            if (d < hour * 2) { return "about 1 hour ago" }
-            if (d < day) { return Math.floor(d / hour) + " hours ago" }
-            if (d > day && d < day * 2) { return "yesterday" }
-            if (d < day * 365) { return Math.floor(d / day) + " days ago" } else { return "over a year ago" }
-        }
-
-        function enc(html) {
-            if (typeof html != "string") return html;
-            return html.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        function dirPath(path) {
-            if (typeof path != "string") return path;
-            var strPos = path.lastIndexOf('/', path.length - 1);
-            if (strPos == -1) return path;
-            return path.substr(0, strPos);
-        }
-
-        function _mkAjax(url, data, callback, type, method) {
-            if ($.isFunction(data)) {
-                callback = data, data = {};
-            }
-            return $.ajax({ type: method, url: url, data: data, success: callback, contentType: type });
-        }
-
-        $.extend({
-            put: function (url, data, callback, type) {
-                return _mkAjax(url, data, callback, type, 'PUT');
-            },
-            del: function (url, data, callback, type) {
-                return _mkAjax(url, data, callback, type, 'DELETE');
-            },
-            setdefault: function(url,data,callback,type ) {
-                return _mkAjax(url,data,callback,type,'PUT');
-            }
-        });
-
-        var href = "files", lastHref = "";
-
-        var mkapp = function () {
-            var app = $("#appname");
-            var guid = $("#appguid");
-            if (!app.val()) {
-                alert("Enter the name of the application first");
-                app.focus();
-                return;
-            }
-            if (!guid.val()) {
-                alert("Enter the name of the application first");
-                app.focus();
-                return;
-            }
-            $.post(href + "/" + guid.val(), { AppName: app.val() }, function () { app.val(''); guid.val(''); refresh(); });
-        };
-
-        var mkver = function () {
-            var ver = $("#appver");
-            if (!ver.val()) {
-                alert("Enter the version of the application first");
-                ver.focus();
-                return;
-            }
-            $.post(href + "/" + ver.val(), function () { ver.val(''); refresh(); });
-        };
-
-        $(".mkapp .btn").click(mkapp);
-        $(".mkver .btn").click(mkver);
-        $(".mkapp INPUT").keypress(function (e) { if (e.which == '13') mkapp(); });
-        $(".mkver INPUT").keypress(function (e) { if (e.which == '13') mkver(); });
-        $(".upload .btn").click(function () {
-            var file = $("#fileupload").val();
-            if (!file) {
-                alert("Select a file to upload first");
-                return;
-            }
-            try {
-                $.ajaxFileUpload({
-                    url: href,
-                    secureuri: false,
-                    fileElementId: 'fileupload',
-                    success: refresh
-                });
-            }
-            catch (e) {
-                alert("Not supported in " + ($.browser.msie ? "IE" : "this browser" + e));
-            }
-        });
-
-        $(".btn").mousedown(function () { $(this).toggleClass("mousedown"); });
-        $(".btn").mouseup(function () { $(this).toggleClass("mousedown"); });
-        var refresh = function (callback, skipPushState) {
-            if (!skipPushState && window.history.pushState)
-                window.history.pushState(href, href.replace('/', ' / '), '#!' + href);
-
-
-            var jqLs = $("#ls");
-            $.getJSON(href, function (r) {
-
-                // set breadcrumbs.
-                var sb = '<div id="breadcrumb">';
-                var bc_base = "";
-                for (var i = 0; i < r.breadcrumbs.length; i++) {
-                    var bc = r.breadcrumbs[i];
-                    if (!bc) continue;
-                    sb += (i == r.breadcrumbs.length - 1)
-                    ? '<strong>' + r.breadcrumbnames[i] + '</strong>'
-                    : '<a href="#!' + bc_base + bc + '">' + r.breadcrumbnames[i] + '</a><b>/</b>';
-                    bc_base += bc + "/";
-                }
-
-                if (r.breadcrumbs.length != 1)
-                    $("#appadmin").hide();
-                else
-                    $("#appadmin").show();
-
-                if (r.breadcrumbs.length != 2)
-                    $("#veradmin").hide();
-                else
-                    $("#veradmin").show();
-
-                if (r.breadcrumbs.length != 3)
-                    $("#verfileupload").hide();
-                else
-                    $("#verfileupload").show();
-
-                $("#breadcrumb").html(sb + "</div>");
-                //
-                var navBack = lastHref.length > href.length && lastHref.substr(0, href.length) == href,
-                nextCls = navBack ? "results-0" : "results-2",
-                hasResults = $("#ls TABLE").length == 1,
-                cls = !hasResults ? "results-1" : nextCls;
-                var sb = "<div class='" + cls + "'><table><thead><tr><th>name</th><th>age</th><th>size</th></thead><tbody>";
-
-                var files = r.Files;
-
-                if (files) {
-                    if (files.length > 1) {
-                        var upHref = href.substr(0, href.lastIndexOf('/', href.length - 2));
-                        sb += "<tr><td><a class='up-dir' href='#!" + upHref + "'>..<a></td><td></td><td></td></tr>";
-                    }
-                    $.each(files, function (i, file) {
-                        sb += "<tr><td><a class='file' href='#!" + href + "/" + file.Name + "'><b class='del' href='#!deletefile'></b>" + file.Name + "</a></td><td>"
-                        + toTwitterTime(fromDtoDate(file.ModifiedDate)) + "</td><td>"
-                        + file.FileSizeBytes + " bytes</td>";
-                    });
-                }
-
-                $("#fileview").html("").hide();
-                var apps = r.Containers;
-
-                if (apps) {
-                    $.each(apps, function (i, app) {
-                        if (r.breadcrumbs.length == 2) {
-                            if (app.IsCurrentVersion == "true") {
-                                sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='curver'></b></a></td><td>"
-                                + " Just Noww" + "</td><td>"
-                                + "items</td>";
-                            }
-                            else {
-                                sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "<b class ='verset' href='#!setversiondefault'></b></a></td><td>"
-                                + " Just Noww" + "</td><td>"
-                                + "items</td>";
-                            }
-                        }
-                        else
-                            sb += "<tr><td><a class='dir' href='#!" + href + "/" + app.LinkName + "'>" + app.DisplayName + "</a></td></td>";
-                    });
-                }
-
-                sb += "</tbody></table></div>";
-
-                $("#fileadmin").show();
-                $("#ls").show().append(sb);
-
-                var jq1 = $(".results-1"), jq2 = $("." + nextCls), el1 = jq1[0], el2 = jq2[0];
-                if (el1 && el2) {
-                    jqLs.css({ "min-height": Math.max(jq1.height(), jq2.height()) + "px" });
-
-                    jq1.addClass(navBack ? "slide-right" : "slide-left");
-                    jq2.addClass(navBack ? "slide-right" : "slide-left");
-
-                    setTimeout(function () {
-                        jqLs.children().first().remove();
-                        jqLs.children().first()[0].className = "results-1";
-                    }, 450);
-                }
-                else {
-                    $("#ls").css({ "min-height": jq1.height() + "px" });
-                }
-            });
-        };
-        window.onpopstate = function (e) {
-            e = e || event;
-            if (!e.state) return;
-            href = e.state;
-            refresh(null, true);
-        };
-
-        var clickHandlers = {
-            files: function (el, e, href) {
-                if (e.ctrlKey || e.shiftKey) {
-                    window.open('#!' + href);
-                    return;
-                }
-                refresh();
-            },
-            setversiondefault: function (el) {
-                var verHref = $(el.parentNode).attr('href').substr(2);
-                $.setdefault(verHref, { VersionDefault: 'true' }, refresh);
-                href = dirPath(verHref); location.hash = '#!' + href;
-            }
-
-        }
-
-        $(document).click(function (e) {
-            var attrHref, el = e.target;
-            do { attrHref = el.getAttribute("href"); } while (!attrHref && (el = el.parentElement));
-            if (!attrHref) return;
-
-            if (attrHref.substr(0, 2) == "#!") {
-                lastHref = href, href = attrHref.substr(2);
-                var cmd = href.split('/')[0];
-
-                var clickHandler = clickHandlers[cmd];
-                if (clickHandler) {
-                    if (e.preventDefault) e.preventDefault();
-                    clickHandler(el, e, href);
-                }
-            }
-        });
-
-
-
-
-      var hash = location.hash.indexOf('#!') === 0 && location.hash.substr(2);
-      if (hash) href = hash;
-      refresh();
-  </script>
 </body>
 </html>

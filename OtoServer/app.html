@@ -1,0 +1,14 @@
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Modified</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="oto_app in oto_data | orderBy:'DisplayName'">
+			<td><a href="{{oto_app.LinkName}}" target="_blank">{{oto_app.DisplayName}}</a></td>
+			<td>1 day ago</td>
+		</tr>
+	</tbody>
+</table>
