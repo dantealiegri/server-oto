@@ -1,0 +1,14 @@
+<table>
+	<thead>
+		<tr>
+			<th>Version</th>
+			<th>Modified</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="oto_version in oto_single_app | orderBy:'DisplayName'">
+			<td><a href="{{oto_version.LinkName}}">{{oto_version.DisplayName}}</a></td>
+			<td>1 day ago</td>
+		</tr>
+	</tbody>
+</table>

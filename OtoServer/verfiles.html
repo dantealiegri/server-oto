@@ -1,0 +1,18 @@
+<table>
+	<thead>
+		<tr>
+			<th>File Name</th>
+			<th>Extension</th>
+			<th>Size</th>
+			<th>Modified</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="oto_file in oto_app_ver | orderBy:'DisplayName'">
+			<td>{{oto_file.Name}}</td>
+			<td>{{oto_file.Extension}}</td>
+			<td>{{oto_file.FileSizeBytes}}</td>
+			<td>{{oto_file.ModifiedDate}}</td>
+		</tr>
+	</tbody>
+</table>
